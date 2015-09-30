@@ -6,29 +6,55 @@ import java.util.*;
  * Created by egan on 9/29/15.
  */
 public class AttrSet {
-    public SortedMap<String, Annotation> attrs;
+    public String name;
+    public SortedMap<String, Annotation> values;
 
-    public AttrSet(SortedMap<String, Annotation> attrs) {
-        this.attrs = attrs;
+    public AttrSet(String attrName, SortedMap<String, Annotation> attrValues) {
+        name = attrName;
+        values = attrValues;
     }
 
     public AttrSet(AttrSet base) {
-        this.attrs = new TreeMap<>(base.attrs);
+        name = base.name;
+        values = new TreeMap<>(base.values);
+    }
+
+    public boolean containsValue(String val) {
+        return values.containsKey(val);
     }
 
     public Set<String> getValues() {
-        return attrs.keySet();
+        return values.keySet();
     }
 
     public Annotation getAnnotation(String attrValue) {
-        return attrs.get(attrValue);
-    }
-
-    public static AttrSet getEmpty() {
-        return new AttrSet(new TreeMap<String, Annotation>());
+        return values.get(attrValue);
     }
 
     public void intersect(AttrSet other) {
+        values.keySet().retainAll(other.getValues());
+        for (String val : values.keySet()) {
+            Annotation a1 = getAnnotation(val);
+            Annotation a2 = other.getAnnotation(val);
+            Annotation a3;
+            if (a1 == null) {
+                a3 = a2;
+            } else if (a2 == null) {
+                a3 = a1;
+            } else {
+                a3 = a1.mult(a2);
+            }
+            values.put(val, a3);
+        }
         return;
+    }
+
+    public String toString(){
+        StringBuilder s = new StringBuilder();
+        s.append(name+"||Values:");
+        for (String val : values.keySet()) {
+            s.append(val+"=>"+values.get(val).toString());
+        }
+        return s.toString();
     }
 }

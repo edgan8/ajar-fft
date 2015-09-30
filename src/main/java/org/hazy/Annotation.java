@@ -9,4 +9,5 @@ public interface Annotation {
     Annotation add(Annotation a);
     Annotation mult(Annotation a);
     Annotation copy();
+    String toString();
 }

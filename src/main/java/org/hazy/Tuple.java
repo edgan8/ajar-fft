@@ -23,7 +23,7 @@ public class Tuple {
     }
 
     public Tuple append(String attrName, String attrValue, Annotation attrAnnot) {
-        Map<String, String> newAttrMap = new HashMap<String, String>(attrs);
+        Map<String, String> newAttrMap = new HashMap<>(attrs);
         newAttrMap.put(attrName, attrValue);
         Annotation newAnnot;
         if (annot == null) {
@@ -58,6 +58,9 @@ public class Tuple {
         StringBuilder s = new StringBuilder();
         for (String attrName : attrs.keySet()) {
             s.append(attrName+":"+attrs.get(attrName)+",");
+        }
+        if (annot != null) {
+            s.append("ANNOT:"+annot.toString());
         }
         return s.toString();
     }

@@ -21,15 +21,15 @@ public class RelationTreeImpl implements RelationTrie{
         return attrOrder.contains(attr);
     }
     public AttrSet index(Tuple tKey, String attr) {
-        TreeMap<String, Annotation> attrs = new TreeMap<>();
+        TreeMap<String, Annotation> attrValues = new TreeMap<>();
         for (Tuple existingTuple : tuples) {
             if (existingTuple.containsAttr(attr)) {
                 if (existingTuple.match(tKey)) {
-                    attrs.put(tKey.getAttrValue(attr), existingTuple.getAnnot());
+                    attrValues.put(existingTuple.getAttrValue(attr), existingTuple.getAnnot());
                 }
             }
         }
-        return new AttrSet(attrs);
+        return new AttrSet(attr, attrValues);
     }
     public void insert(Tuple t) {
         tuples.add(t);
