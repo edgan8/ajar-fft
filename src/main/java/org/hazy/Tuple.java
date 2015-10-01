@@ -3,11 +3,12 @@ package org.hazy;
 import java.util.*;
 
 /**
+ * Immutable Tuple class
  * Created by egan on 9/28/15.
  */
 public class Tuple {
-    public Map<String, String> attrs;
-    public Annotation annot;
+    public final Map<String, String> attrs;
+    public final Annotation annot;
 
     public static Tuple empty() {
         return new Tuple(new HashMap<>(), null);
@@ -18,21 +19,18 @@ public class Tuple {
         this.annot = a;
     }
 
+    public Tuple setAnnot(Annotation a) {
+        return new Tuple(attrs, a);
+    }
+
     public Annotation getAnnot() {
         return annot;
     }
 
-    public Tuple append(String attrName, String attrValue, Annotation attrAnnot) {
+    public Tuple append(String attrName, String attrValue) {
         Map<String, String> newAttrMap = new HashMap<>(attrs);
         newAttrMap.put(attrName, attrValue);
-        Annotation newAnnot;
-        if (annot == null) {
-            newAnnot = attrAnnot;
-        } else {
-            newAnnot = annot.mult(attrAnnot);
-        }
-
-        return new Tuple(newAttrMap, newAnnot);
+        return new Tuple(newAttrMap, annot);
     }
 
     public boolean containsAttr(String attrName) {
@@ -52,6 +50,19 @@ public class Tuple {
             }
         }
         return matchesAllShared;
+    }
+
+    public boolean equalAttrs(Tuple other) throws IndexOutOfBoundsException {
+        Set<String> attrNames = attrs.keySet();
+        for (String attrName : attrNames) {
+            if (!other.containsAttr(attrName)) {
+                return false;
+            }
+            if (!other.getAttrValue(attrName).equals(getAttrValue(attrName))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String toString() {

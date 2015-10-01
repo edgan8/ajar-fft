@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 public class RelationTreeImplTest {
     @Test
     public void simpleIndexTest() {
-        ArrayList<String> attrOrdering = new ArrayList<>(Arrays.asList("A", "B", "C"));
+        String[] attrOrdering = {"A", "B"};
         RelationTrie tree = new RelationTreeImpl(attrOrdering);
 
         Map<String, String> attrs = new TreeMap<>();
@@ -26,6 +26,7 @@ public class RelationTreeImplTest {
         attrs.put("A", "1");
         t = new Tuple(attrs, new IntAnnot(5));
         tree.insert(t);
+        assertTrue(tree.hasAttribute("A"));
 
         attrs = new TreeMap<>();
         attrs.put("A", "1");
@@ -34,6 +35,5 @@ public class RelationTreeImplTest {
 
         assertTrue(aSet.containsValue("mike"));
         assertTrue(aSet.containsValue("ed"));
-        assertEquals("3", aSet.getAnnotation("ed").toString());
     }
 }

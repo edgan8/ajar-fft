@@ -15,8 +15,9 @@ public class TupleTest {
         attrs.put("name", "ed");
         attrs.put("val", "1");
         Tuple t = new Tuple(attrs, null);
-        t = t.append("place", "stanford", new IntAnnot(2));
-        t = t.append("fish", "gold", new IntAnnot(4));
+        t = t.append("place", "stanford");
+        t = t.append("fish", "gold");
+        t.setAnnot(new IntAnnot(8));
         assertEquals(8, ((IntAnnot)t.getAnnot()).getVal());
         assertTrue(t.containsAttr("place"));
         assertTrue(t.containsAttr("name"));
@@ -39,5 +40,20 @@ public class TupleTest {
         attrs.put("name", "mike");
         Tuple t3 = new Tuple(attrs, null);
         assertFalse(t3.match(t));
+    }
+
+    @Test
+    public void equalAttrsTest() {
+        Map<String, String> attrs = new TreeMap<>();
+        attrs.put("name", "ed");
+        attrs.put("val", "1");
+        Tuple t = new Tuple(attrs, null);
+
+        attrs = new TreeMap<>();
+        attrs.put("name", "ed");
+        Tuple t2 = new Tuple(attrs, null);
+
+        assertTrue(t.equalAttrs(t));
+        assertFalse(t.equalAttrs(t2));
     }
 }

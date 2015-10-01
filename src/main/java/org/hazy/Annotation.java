@@ -1,6 +1,7 @@
 package org.hazy;
 
 /**
+ * Immutable class.
  * Created by egan on 9/29/15.
  */
 public interface Annotation {

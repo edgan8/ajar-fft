@@ -6,9 +6,9 @@ import java.util.*;
  * Created by egan on 9/28/15.
  */
 public class LFTJoin {
-    private ArrayList<String> attrOrdering;
+    private final String[] attrOrdering;
 
-    public LFTJoin(ArrayList<String> attrOrdering) {
+    public LFTJoin(String[] attrOrdering) {
         this.attrOrdering = attrOrdering;
     }
 
@@ -26,31 +26,34 @@ public class LFTJoin {
             Tuple t,
             int attrIndex
     ) throws Exception {
-        if (attrIndex == attrOrdering.size()) {
+        if (attrIndex == attrOrdering.length) {
+            Annotation a = new IntAnnot(1);
+            for (RelationTrie rTrie : relations) {
+                a = a.mult(rTrie.getAnnotation(t));
+            }
+            t = t.setAnnot(a);
             output.insert(t);
             return;
         }
 
-        String curAttribute = this.attrOrdering.get(attrIndex);
+        String curAttribute = this.attrOrdering[attrIndex];
 
         ArrayList<AttrSet> aSets = new ArrayList<>();
         for (RelationTrie rTrie : relations) {
-            AttrSet aSet = rTrie.index(t, curAttribute);
-            // null means doesn't refer to the attribute
-            if (aSet != null) {
-                aSets.add(aSet);
+            if (rTrie.hasAttribute(curAttribute)) {
+                aSets.add(rTrie.index(t, curAttribute));
             }
         }
         if (aSets.size() == 0) {
-            throw new Exception("should have a set");
+            throw new Exception("There should exist a relation for each attribute.");
         }
         AttrSet intersectionSet = new AttrSet(aSets.get(0));
-        for (int i = 0; i < aSets.size(); i++) {
+        for (int i = 1; i < aSets.size(); i++) {
             intersectionSet.intersect(aSets.get(i));
         }
         Set<String> intersectedValues = intersectionSet.getValues();
         for (String attrValue : intersectedValues) {
-            Tuple newTuple = t.append(curAttribute, attrValue, intersectionSet.getAnnotation(attrValue));
+            Tuple newTuple = t.append(curAttribute, attrValue);
             join(relations,
                     output,
                     newTuple,
