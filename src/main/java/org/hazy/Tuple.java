@@ -18,6 +18,14 @@ public class Tuple {
         this.attrs = attrs;
         this.annot = a;
     }
+    public Tuple(Map<String, String> attrs) {
+        this.attrs = attrs;
+        this.annot = null;
+    }
+
+    public Map<String, String> getAttrs() {
+        return attrs;
+    }
 
     public Tuple setAnnot(Annotation a) {
         return new Tuple(attrs, a);

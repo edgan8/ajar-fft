@@ -10,7 +10,7 @@ public interface RelationTrie {
     boolean hasAttribute(String attr);
     /**
      * Returns all the values of attr which match tKey if applicable.
-     * @param tKey fields on which the output must agree
+     * @param t fields on which the output must agree
      * @param attr attribute values we care about.
      * @return Set if the attribute is in the relation, emptyset if no matches.
      */

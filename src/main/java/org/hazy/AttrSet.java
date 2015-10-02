@@ -3,7 +3,7 @@ package org.hazy;
 import java.util.*;
 
 /**
- * Mutable set of string attribute values
+ * Mostly immutable set of string attribute values
  * Created by egan on 9/29/15.
  */
 public class AttrSet {

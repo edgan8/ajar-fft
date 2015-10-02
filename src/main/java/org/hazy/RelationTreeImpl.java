@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 /**
- * Implements a relation using a list of raw tuples
+ * Implements a relation using a list of raw tuplesa
  * Created by egan on 9/29/15.
  */
 public class RelationTreeImpl implements RelationTrie{

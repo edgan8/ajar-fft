@@ -59,6 +59,8 @@ public class LFTJoinTest {
         relationsToJoin.add(tree2);
         try {
             RelationTrie output = join.run(relationsToJoin);
+            ArrayList<Tuple> results = output.getTuples();
+            assertEquals(3, results.size());
             System.out.println(output.getTuples());
         } catch (Exception e) {
             fail("Thrown exception:"+e.getMessage());
