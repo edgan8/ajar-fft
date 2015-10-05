@@ -1,5 +1,7 @@
 package org.hazy;
 
+import java.util.Map;
+
 /**
  * Created by egan on 9/27/15.
  */
@@ -19,5 +21,23 @@ public class MathUtils {
             i++;
         }
         return i;
+    }
+
+    public static int convertFromBaseNTuple(int base, Map<String, String> baseNTuple) {
+        int result = 0;
+        for (String attrName : baseNTuple.keySet()) {
+            IndexedAttr idxAttr = new IndexedAttr(attrName);
+            int exp = idxAttr.idx;
+            result += intPow(base, exp) * Integer.parseInt(baseNTuple.get(attrName));
+        }
+        return result;
+    }
+
+    public static int intPow(int n, int p) {
+        int res = 1;
+        for (int i = 0; i < p; i++) {
+            res *= n;
+        }
+        return res;
     }
 }

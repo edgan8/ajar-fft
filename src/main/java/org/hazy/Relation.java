@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by egan on 9/28/15.
  */
-public interface RelationTrie {
+interface Relation {
     ArrayList<Tuple> getTuples();
     boolean hasAttribute(String attr);
     /**
@@ -16,5 +16,7 @@ public interface RelationTrie {
      */
     AttrSet index(Tuple t, String attr);
     Annotation getAnnotation(Tuple t);
+
     void insert(Tuple t);
+    Relation aggregate(String attr);
 }

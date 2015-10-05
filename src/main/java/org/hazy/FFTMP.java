@@ -5,14 +5,15 @@ import org.apache.commons.math3.complex.Complex;
 import java.util.Arrays;
 
 /**
+ * FFT implemented using the tranform described in MPF naively
  * Created by egan on 9/27/15.
  */
-public class MPFTransform {
+public class FFTMP {
     // n = 2^m
     private int n;
     private int m;
 
-    public MPFTransform(int n) {
+    public FFTMP(int n) {
         int powerOfTwo = Integer.highestOneBit(n);
         if (powerOfTwo != n) {
             powerOfTwo *= 2;

@@ -12,24 +12,29 @@ public class LFTJoin {
         this.attrOrdering = attrOrdering;
     }
 
-    public RelationTrie run(
-            ArrayList<RelationTrie> relations
+    public Relation run(
+            ArrayList<Relation> relations
     ) throws Exception {
-        RelationTrie output = new RelationTreeImpl(attrOrdering);
+        Relation output = new RelationList(attrOrdering);
         join(relations, output, Tuple.empty(), 0);
         return output;
     }
 
     private void join(
-            ArrayList<RelationTrie> relations,
-            RelationTrie output,
+            ArrayList<Relation> relations,
+            Relation output,
             Tuple t,
             int attrIndex
     ) throws Exception {
         if (attrIndex == attrOrdering.length) {
-            Annotation a = new IntAnnot(1);
-            for (RelationTrie rTrie : relations) {
-                a = a.mult(rTrie.getAnnotation(t));
+            Annotation a = null;
+            for (Relation rTrie : relations) {
+                Annotation rAnnot = rTrie.getAnnotation(t);
+                if (a == null) {
+                    a = rAnnot;
+                } else {
+                    a = a.mult(rAnnot);
+                }
             }
             t = t.setAnnot(a);
             output.insert(t);
@@ -39,7 +44,7 @@ public class LFTJoin {
         String curAttribute = this.attrOrdering[attrIndex];
 
         ArrayList<AttrSet> aSets = new ArrayList<>();
-        for (RelationTrie rTrie : relations) {
+        for (Relation rTrie : relations) {
             if (rTrie.hasAttribute(curAttribute)) {
                 aSets.add(rTrie.index(t, curAttribute));
             }

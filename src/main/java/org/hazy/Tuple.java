@@ -15,11 +15,11 @@ public class Tuple {
     }
 
     public Tuple(Map<String, String> attrs, Annotation a) {
-        this.attrs = attrs;
+        this.attrs = new HashMap<>(attrs);
         this.annot = a;
     }
     public Tuple(Map<String, String> attrs) {
-        this.attrs = attrs;
+        this.attrs = new HashMap<>(attrs);
         this.annot = null;
     }
 
@@ -38,6 +38,12 @@ public class Tuple {
     public Tuple append(String attrName, String attrValue) {
         Map<String, String> newAttrMap = new HashMap<>(attrs);
         newAttrMap.put(attrName, attrValue);
+        return new Tuple(newAttrMap, annot);
+    }
+
+    public Tuple remove(String attrName) {
+        Map<String, String> newAttrMap = new HashMap<>(attrs);
+        newAttrMap.remove(attrName);
         return new Tuple(newAttrMap, annot);
     }
 
@@ -60,7 +66,11 @@ public class Tuple {
         return matchesAllShared;
     }
 
-    public boolean equalAttrs(Tuple other) throws IndexOutOfBoundsException {
+    public boolean equals(Object otherObj) throws IndexOutOfBoundsException {
+        if (!(otherObj instanceof Tuple)) {
+            return false;
+        }
+        Tuple other = (Tuple)otherObj;
         Set<String> attrNames = attrs.keySet();
         for (String attrName : attrNames) {
             if (!other.containsAttr(attrName)) {
@@ -71,6 +81,13 @@ public class Tuple {
             }
         }
         return true;
+    }
+    public int hashCode() {
+        StringBuilder s = new StringBuilder();
+        for (String attrName : attrs.keySet()) {
+            s.append(attrName+":"+attrs.get(attrName)+",");
+        }
+        return s.toString().hashCode();
     }
 
     public String toString() {

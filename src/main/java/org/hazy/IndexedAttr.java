@@ -17,9 +17,6 @@ public class IndexedAttr {
         this.attrBase = baseAttr;
         this.idx = idx;
     }
-    public static boolean isIndexed(String encoded) {
-        return encoded.contains("$");
-    }
     public boolean equals(IndexedAttr other) {
         return this.attrBase.equals(other.attrBase) &&
                 this.idx == other.idx;
@@ -29,5 +26,9 @@ public class IndexedAttr {
     }
     public String toString() {
         return attrBase+"$"+idx;
+    }
+
+    public static boolean isIndexed(String encoded) {
+        return encoded.contains("$");
     }
 }

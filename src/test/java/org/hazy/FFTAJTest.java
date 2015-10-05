@@ -1,33 +1,36 @@
 package org.hazy;
 
-import org.jtransforms.fft.DoubleFFT_1D;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class MPFTransformTest {
+public class FFTAJTest {
     @Test
-    public void canFFTZeroes() {
+    public void canFFTZeroes() throws Exception {
+        int p = 2;
+        int m = 3;
         int n = 8;
         double[] zeroes = new double[n];
-        MPFTransform fft = new MPFTransform(n);
+        FFTAJ fft = new FFTAJ(p, m);
         double[] freqSamples = fft.realForward(zeroes);
         assertEquals(0.0, freqSamples[0], .001);
     }
 
     @Test
-    public void canFFTSingle() {
+    public void canFFTSingle() throws Exception {
+        int p = 2;
+        int m = 3;
         int n = 8;
-        double[] waveSamples = new double[2*n];
+        double[] waveSamples = new double[n];
         for (int i = 0; i < n; i++) {
             waveSamples[i] = Math.cos(
                     (double) 2*Math.PI*i / n
             ) / n;
         }
 
-        MPFTransform fft = new MPFTransform(n);
+        FFTAJ fft = new FFTAJ(p, m);
         double[] freqSamples = fft.realForward(waveSamples);
 
         // no constant component

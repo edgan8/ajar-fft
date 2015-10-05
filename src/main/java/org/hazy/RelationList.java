@@ -1,18 +1,22 @@
 package org.hazy;
 
-import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
- * Implements a relation using a list of raw tuplesa
+ * Implements a relation using a list of raw tuples.
+ * Very inefficient but useful as a correctness benchmark.
  * Created by egan on 9/29/15.
  */
-public class RelationTreeImpl implements RelationTrie{
+public class RelationList implements Relation {
     // specifies both the order and the attributes it contains
     public final String[] attrOrder;
     public ArrayList<Tuple> tuples;
 
-    public RelationTreeImpl (String[] attrOrder) {
+    public RelationList(String[] attrOrder, Collection<Tuple> tuples) {
+        this.attrOrder = attrOrder;
+        this.tuples = new ArrayList<>(tuples);
+    }
+    public RelationList(String[] attrOrder) {
         this.attrOrder = attrOrder;
         this.tuples = new ArrayList<>();
     }
@@ -54,5 +58,24 @@ public class RelationTreeImpl implements RelationTrie{
     }
     public void insert(Tuple t) {
         tuples.add(t);
+    }
+
+    public Relation aggregate(String attr) {
+        HashMap<Tuple, Annotation> newTuples = new HashMap<>();
+        for (Tuple existingTuple : tuples) {
+            Tuple tempNewTuple = existingTuple.remove(attr);
+            if (newTuples.containsKey(tempNewTuple)) {
+                newTuples.put(
+                        tempNewTuple,
+                        newTuples.get(tempNewTuple).add(tempNewTuple.getAnnot()));
+            } else {
+                newTuples.put(tempNewTuple, tempNewTuple.getAnnot());
+            }
+        }
+        Relation newRelationList = new RelationList(attrOrder);
+        for (Tuple newTuple : newTuples.keySet()) {
+            newRelationList.insert(newTuple.setAnnot(newTuples.get(newTuple)));
+        }
+        return newRelationList;
     }
 }

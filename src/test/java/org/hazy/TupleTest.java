@@ -53,7 +53,7 @@ public class TupleTest {
         attrs.put("name", "ed");
         Tuple t2 = new Tuple(attrs, null);
 
-        assertTrue(t.equalAttrs(t));
-        assertFalse(t.equalAttrs(t2));
+        assertTrue(t.equals(t));
+        assertFalse(t.equals(t2));
     }
 }

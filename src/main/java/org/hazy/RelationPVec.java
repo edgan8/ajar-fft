@@ -8,7 +8,7 @@ import java.util.TreeSet;
 /**
  * Created by egan on 10/1/15.
  */
-public class RelationPVec implements RelationTrie {
+public class RelationPVec implements Relation {
     public String name;
     public Annotation[] values;
     public int base;
@@ -72,5 +72,9 @@ public class RelationPVec implements RelationTrie {
 
     public void insert(Tuple t) {
         throw new UnsupportedOperationException("Can't insert into Pvec");
+    }
+
+    public Relation aggregate(String attr) {
+        throw new UnsupportedOperationException("Can't aggregate into Pvec");
     }
 }

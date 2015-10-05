@@ -6,7 +6,7 @@ import java.util.TreeSet;
 /**
  * Created by egan on 10/1/15.
  */
-public class RelationFFTFactor implements RelationTrie {
+public class RelationFFTFactor implements Relation {
     // n = base ^ m
     public int base;
     public int m;
@@ -64,5 +64,10 @@ public class RelationFFTFactor implements RelationTrie {
 
     public void insert(Tuple t) {
         throw new UnsupportedOperationException("Can't insert into FFT Factor");
+    }
+
+    @Override
+    public Relation aggregate(String attr) {
+        throw new UnsupportedOperationException("Can't aggregate into FFT Factor");
     }
 }

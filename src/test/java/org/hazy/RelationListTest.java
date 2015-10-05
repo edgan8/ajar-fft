@@ -9,11 +9,11 @@ import static org.junit.Assert.*;
 /**
  * Created by egan on 9/29/15.
  */
-public class RelationTreeImplTest {
+public class RelationListTest {
     @Test
     public void simpleIndexTest() {
         String[] attrOrdering = {"A", "B"};
-        RelationTrie tree = new RelationTreeImpl(attrOrdering);
+        Relation tree = new RelationList(attrOrdering);
 
         Map<String, String> attrs = new TreeMap<>();
         attrs.put("B", "ed");
@@ -35,5 +35,22 @@ public class RelationTreeImplTest {
 
         assertTrue(aSet.containsValue("mike"));
         assertTrue(aSet.containsValue("ed"));
+    }
+    @Test
+    public void aggregateTest() {
+        String[] attrOrdering = {"A", "B"};
+        Relation rList = new RelationList(attrOrdering);
+
+        Map<String, String> attrs = new TreeMap<>();
+        for (int i = 0; i < 5; i++) {
+            attrs.put("A", Integer.toString(i));
+            for (int j = 0; j < 5; j++) {
+                attrs.put("B", Integer.toString(j));
+                Tuple t = new Tuple(attrs, new IntAnnot(1));
+                rList.insert(t);
+            }
+        }
+        Relation agList = rList.aggregate("B");
+        System.out.println(agList.getTuples());
     }
 }
