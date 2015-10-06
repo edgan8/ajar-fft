@@ -22,5 +22,7 @@ public class RelationPVecTest {
         ArrayList<Tuple> output = r.getTuples();
         System.out.println(output);
         assertEquals(8, output.size());
+        assertTrue(r.hasAttribute((new IndexedAttr("X", 1)).toString()));
+        assertTrue(r.hasAttribute((new IndexedAttr("X", 2)).toString()));
     }
 }

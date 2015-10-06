@@ -12,8 +12,8 @@ import static org.junit.Assert.*;
 public class RelationListTest {
     @Test
     public void simpleIndexTest() {
-        String[] attrOrdering = {"A", "B"};
-        Relation tree = new RelationList(attrOrdering);
+        ArrayList<String> attrNames = new ArrayList<>(Arrays.asList("A", "B"));
+        Relation tree = new RelationList(attrNames);
 
         Map<String, String> attrs = new TreeMap<>();
         attrs.put("B", "ed");
@@ -38,8 +38,8 @@ public class RelationListTest {
     }
     @Test
     public void aggregateTest() {
-        String[] attrOrdering = {"A", "B"};
-        Relation rList = new RelationList(attrOrdering);
+        ArrayList<String> attrNames = new ArrayList<>(Arrays.asList("A", "B"));
+        Relation rList = new RelationList(attrNames);
 
         Map<String, String> attrs = new TreeMap<>();
         for (int i = 0; i < 5; i++) {
@@ -51,6 +51,10 @@ public class RelationListTest {
             }
         }
         Relation agList = rList.aggregate("B");
-        System.out.println(agList.getTuples());
+        List<Tuple> resultTuples = agList.getTuples();
+        assertEquals(5, resultTuples.size());
+        assertEquals("5", resultTuples.get(0).getAnnot().toString());
+        assertFalse(agList.hasAttribute("B"));
+        assertTrue(agList.hasAttribute("A"));
     }
 }

@@ -3,6 +3,7 @@ package org.hazy;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,13 +15,13 @@ import static org.junit.Assert.*;
 public class LFTJoinTest {
     @Test
     public void simpleIndexTest() {
-        String[] globalAttrOrdering = {"Pet", "Name", "State"};
+        ArrayList<String> globalAttrOrdering = new ArrayList<>(Arrays.asList("Pet", "Name", "State"));
         LFTJoin join = new LFTJoin(globalAttrOrdering);
         ArrayList<Relation> relationsToJoin = new ArrayList<>();
 
         // Relation 1
-        String[] attrOrdering1 = {"Name", "State"};
-        Relation tree1 = new RelationList(attrOrdering1);
+        ArrayList<String> attrNames1 = new ArrayList<>(Arrays.asList("Name", "State"));
+        Relation tree1 = new RelationList(attrNames1);
         Map<String, String> attrs = new TreeMap<>();
         attrs.put("State", "md");
         attrs.put("Name", "ed");
@@ -34,8 +35,8 @@ public class LFTJoinTest {
         tree1.insert(t);
 
         // Relation 2
-        String[] attrOrdering2 = {"Pet", "Name"};
-        Relation tree2 = new RelationList(attrOrdering2);
+        ArrayList<String> attrNames2 = new ArrayList<>(Arrays.asList("Pet", "Name"));
+        Relation tree2 = new RelationList(attrNames2);
         attrs = new TreeMap<>();
         attrs.put("Pet", "fido");
         attrs.put("Name", "ed");

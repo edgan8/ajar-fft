@@ -17,7 +17,7 @@ public class TupleTest {
         Tuple t = new Tuple(attrs, null);
         t = t.append("place", "stanford");
         t = t.append("fish", "gold");
-        t.setAnnot(new IntAnnot(8));
+        t = t.setAnnot(new IntAnnot(8));
         assertEquals(8, ((IntAnnot)t.getAnnot()).getVal());
         assertTrue(t.containsAttr("place"));
         assertTrue(t.containsAttr("name"));

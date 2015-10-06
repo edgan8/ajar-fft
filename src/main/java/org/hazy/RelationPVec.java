@@ -13,6 +13,7 @@ public class RelationPVec implements Relation {
     public Annotation[] values;
     public int base;
     public int numDigits;
+    public int n;
     public TreeSet<String> completeValues;
 
     public RelationPVec(String name, Annotation[] values, int base, int numDigits) {
@@ -20,18 +21,26 @@ public class RelationPVec implements Relation {
         this.values = values;
         this.base = base;
         this.numDigits = numDigits;
+        this.n = MathUtils.intPow(base, numDigits);
         this.completeValues = new TreeSet<>();
         for (int i = 0; i < base; i++) {
             this.completeValues.add(Integer.toString(i));
         }
     }
 
+    public ArrayList<String> getAttributes() {
+        ArrayList<String> attrs = new ArrayList<>();
+        for (int i = 0; i < numDigits; i++) {
+            attrs.add((new IndexedAttr(name, i)).toString());
+        }
+        return attrs;
+    }
+
     public ArrayList<Tuple> getTuples() {
         int[] digits = new int[30];
         ArrayList<Tuple> output = new ArrayList<>();
 
-        long maxIndex = Math.round(Math.pow(base, numDigits));
-        for (int i = 0; i < maxIndex; i++) {
+        for (int i = 0; i < n; i++) {
             HashMap<String, String> attrValues = new HashMap<>();
             MathUtils.convertBaseN(i, base, digits);
             for (int j = 0; j < numDigits; j++){
@@ -48,7 +57,7 @@ public class RelationPVec implements Relation {
     public boolean hasAttribute(String attr) {
         if (IndexedAttr.isIndexed(attr)) {
             IndexedAttr iAttr = new IndexedAttr(attr);
-            return (iAttr.attrBase.equals(name) && iAttr.idx > 0 && iAttr.idx < base);
+            return (iAttr.attrBase.equals(name) && iAttr.idx >= 0 && iAttr.idx < numDigits);
         }
         return false;
     }

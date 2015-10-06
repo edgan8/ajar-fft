@@ -6,10 +6,10 @@ import java.util.*;
  * Created by egan on 9/28/15.
  */
 public class LFTJoin {
-    private final String[] attrOrdering;
+    private final ArrayList<String> attrOrdering;
 
-    public LFTJoin(String[] attrOrdering) {
-        this.attrOrdering = attrOrdering;
+    public LFTJoin(ArrayList<String> attrOrdering) {
+        this.attrOrdering = new ArrayList<>(attrOrdering);
     }
 
     public Relation run(
@@ -26,7 +26,7 @@ public class LFTJoin {
             Tuple t,
             int attrIndex
     ) throws Exception {
-        if (attrIndex == attrOrdering.length) {
+        if (attrIndex == attrOrdering.size()) {
             Annotation a = null;
             for (Relation rTrie : relations) {
                 Annotation rAnnot = rTrie.getAnnotation(t);
@@ -36,12 +36,12 @@ public class LFTJoin {
                     a = a.mult(rAnnot);
                 }
             }
-            t = t.setAnnot(a);
+            t = (new Tuple(t)).setAnnot(a);
             output.insert(t);
             return;
         }
 
-        String curAttribute = this.attrOrdering[attrIndex];
+        String curAttribute = attrOrdering.get(attrIndex);
 
         ArrayList<AttrSet> aSets = new ArrayList<>();
         for (Relation rTrie : relations) {
@@ -52,18 +52,18 @@ public class LFTJoin {
         if (aSets.size() == 0) {
             throw new Exception("There should exist a relation for each attribute.");
         }
-        AttrSet intersectionSet = new AttrSet(aSets.get(0));
+        Set<String> intersectionSet = new TreeSet<String>(aSets.get(0).getValues());
         for (int i = 1; i < aSets.size(); i++) {
-            intersectionSet.intersect(aSets.get(i));
+            aSets.get(i).filter(intersectionSet);
         }
-        Set<String> intersectedValues = intersectionSet.getValues();
-        for (String attrValue : intersectedValues) {
-            Tuple newTuple = t.append(curAttribute, attrValue);
+        for (String attrValue : intersectionSet) {
+            t.append(curAttribute, attrValue);
             join(relations,
                     output,
-                    newTuple,
+                    t,
                     attrIndex + 1
             );
+            t.remove(curAttribute);
         }
     }
 }

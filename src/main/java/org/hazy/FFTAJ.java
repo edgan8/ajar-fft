@@ -1,10 +1,12 @@
 package org.hazy;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * FFT implemented using optimal join plan
+ * FFT implemented using hardcoded optimal join plan
  * Created by egan on 10/2/15.
  */
 public class FFTAJ {
@@ -47,25 +49,53 @@ public class FFTAJ {
      * TODO: come up with better ordering
      * @return good attribute ordering to performing join
      */
-    public String[] getAttrOrdering() {
-        String[] attrOrdering = new String[2*m];
+    public ArrayList<String> getAttrOrdering() {
+        ArrayList<String> attrOrdering = new ArrayList<>(2*m);
         for (int i = 0; i < m; i++) {
-            attrOrdering[i] = (new IndexedAttr(xVar, i)).toString();
-            attrOrdering[m+i] = (new IndexedAttr(yVar, i)).toString();
+            attrOrdering.add((new IndexedAttr(xVar, i)).toString());
+        }
+        for (int i = 0; i < m; i++) {
+            attrOrdering.add((new IndexedAttr(yVar, i)).toString());
         }
         return attrOrdering;
     }
 
     public double[] realForward (double[] b) throws Exception {
         ArrayList<Relation> toJoin = getFactors();
-        toJoin.add(getInputRelation(b));
+        Relation bRel = getInputRelation(b);
+        toJoin.add(bRel);
 
-        LFTJoin join = new LFTJoin(getAttrOrdering());
-        double[] outputNums = new double[n * 2];
-        Relation outputRel = join.run(toJoin);
-        for (int i = 0; i < m ; i++) {
-            outputRel = outputRel.aggregate(new IndexedAttr(yVar, i).toString());
+        // join all relation involving y_i and project it out for each y_i
+        for (int i = m - 1; i >= 0; i--) {
+            IndexedAttr aggAttr = new IndexedAttr(yVar, i);
+            ArrayList<Relation> stepJoin = new ArrayList<>();
+            Set<String> stepAttrNames = new HashSet<String>();
+            for (Relation r : toJoin) {
+                if (r.hasAttribute(aggAttr.toString())) {
+                    stepJoin.add(r);
+                    stepAttrNames.addAll(r.getAttributes());
+                }
+            }
+            /*
+            System.out.println(aggAttr.toString());
+            System.out.println(stepJoin);
+            System.out.println(stepAttrNames);
+            */
+            ArrayList<String> stepAttrOrdering = new ArrayList<>(stepAttrNames);
+            LFTJoin join = new LFTJoin(stepAttrOrdering);
+            Relation stepOutput = join.run(stepJoin).aggregate(aggAttr.toString());
+            for (Relation r : stepJoin) {
+                boolean removed = toJoin.remove(r);
+                if (!removed) {
+                    throw (new Exception("could not find relation"));
+                }
+            }
+            toJoin.add(stepOutput);
         }
+        if (toJoin.size() != 1) throw new AssertionError("more than 1 rel left");
+        Relation outputRel = toJoin.get(0);
+
+        double[] outputNums = new double[n * 2];
         ArrayList<Tuple> outputTuples = outputRel.getTuples();
         for (Tuple t : outputTuples) {
             int xVecIdx = MathUtils.convertFromBaseNTuple(p, t.getAttrs());

@@ -3,12 +3,12 @@ package org.hazy;
 import java.util.*;
 
 /**
- * Immutable Tuple class
+ * Mutable Tuple class
  * Created by egan on 9/28/15.
  */
 public class Tuple {
-    public final Map<String, String> attrs;
-    public final Annotation annot;
+    public Map<String, String> attrs;
+    public Annotation annot;
 
     public static Tuple empty() {
         return new Tuple(new HashMap<>(), null);
@@ -22,13 +22,18 @@ public class Tuple {
         this.attrs = new HashMap<>(attrs);
         this.annot = null;
     }
+    public Tuple(Tuple base) {
+        this.attrs = new HashMap<>(base.attrs);
+        this.annot = base.annot;
+    }
 
     public Map<String, String> getAttrs() {
         return attrs;
     }
 
     public Tuple setAnnot(Annotation a) {
-        return new Tuple(attrs, a);
+        annot = a;
+        return this;
     }
 
     public Annotation getAnnot() {
@@ -36,15 +41,13 @@ public class Tuple {
     }
 
     public Tuple append(String attrName, String attrValue) {
-        Map<String, String> newAttrMap = new HashMap<>(attrs);
-        newAttrMap.put(attrName, attrValue);
-        return new Tuple(newAttrMap, annot);
+        attrs.put(attrName, attrValue);
+        return this;
     }
 
     public Tuple remove(String attrName) {
-        Map<String, String> newAttrMap = new HashMap<>(attrs);
-        newAttrMap.remove(attrName);
-        return new Tuple(newAttrMap, annot);
+        attrs.remove(attrName);
+        return this;
     }
 
     public boolean containsAttr(String attrName) {

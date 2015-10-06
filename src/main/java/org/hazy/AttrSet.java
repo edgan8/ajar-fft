@@ -3,21 +3,17 @@ package org.hazy;
 import java.util.*;
 
 /**
- * Mostly immutable set of string attribute values
+ * Immutable set of string attribute values
  * Created by egan on 9/29/15.
  */
 public class AttrSet {
-    public String name;
-    public SortedSet<String> values;
+    private final String name;
+    // assume values is in order
+    private final Set<String> values;
 
-    public AttrSet(String attrName, SortedSet<String> attrValues) {
+    public AttrSet(String attrName, Set<String> attrValues) {
         name = attrName;
         values = attrValues;
-    }
-
-    public AttrSet(AttrSet base) {
-        name = base.name;
-        values = new TreeSet<>(base.values);
     }
 
     public boolean containsValue(String val) {
@@ -28,9 +24,12 @@ public class AttrSet {
         return values;
     }
 
-    public AttrSet intersect(AttrSet other) {
-        values.retainAll(other.getValues());
-        return this;
+    /**
+     * Keep only the elements in other that match those here
+     * @param other set to filter elements from
+     */
+    public void filter(Set<String> other) {
+        other.retainAll(values);
     }
 
     public String toString(){

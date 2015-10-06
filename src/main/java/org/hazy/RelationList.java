@@ -8,28 +8,26 @@ import java.util.*;
  * Created by egan on 9/29/15.
  */
 public class RelationList implements Relation {
-    // specifies both the order and the attributes it contains
-    public final String[] attrOrder;
+    // specifies the attributes it contains
+    public final Set<String> attrs;
     public ArrayList<Tuple> tuples;
 
-    public RelationList(String[] attrOrder, Collection<Tuple> tuples) {
-        this.attrOrder = attrOrder;
+    public RelationList(Collection<String> attrs, Collection<Tuple> tuples) {
+        this.attrs = new HashSet<String>(attrs);
         this.tuples = new ArrayList<>(tuples);
     }
-    public RelationList(String[] attrOrder) {
-        this.attrOrder = attrOrder;
+    public RelationList(Collection<String> attrs) {
+        this.attrs = new HashSet<String>(attrs);
         this.tuples = new ArrayList<>();
     }
     public ArrayList<Tuple> getTuples() {
         return new ArrayList<>(tuples);
     }
     public boolean hasAttribute(String attr) {
-        for (int i = 0; i < attrOrder.length; i++) {
-            if (attrOrder[i].equals(attr)) {
-                return true;
-            }
-        }
-        return false;
+        return attrs.contains(attr);
+    }
+    public ArrayList<String> getAttributes() {
+        return new ArrayList<>(attrs);
     }
 
     public Annotation getAnnotation(Tuple tKey) throws IndexOutOfBoundsException {
@@ -63,18 +61,21 @@ public class RelationList implements Relation {
     public Relation aggregate(String attr) {
         HashMap<Tuple, Annotation> newTuples = new HashMap<>();
         for (Tuple existingTuple : tuples) {
-            Tuple tempNewTuple = existingTuple.remove(attr);
-            if (newTuples.containsKey(tempNewTuple)) {
+            existingTuple.remove(attr);
+            if (newTuples.containsKey(existingTuple)) {
                 newTuples.put(
-                        tempNewTuple,
-                        newTuples.get(tempNewTuple).add(tempNewTuple.getAnnot()));
+                        existingTuple,
+                        newTuples.get(existingTuple).add(existingTuple.getAnnot()));
             } else {
-                newTuples.put(tempNewTuple, tempNewTuple.getAnnot());
+                newTuples.put(existingTuple, existingTuple.getAnnot());
             }
         }
-        Relation newRelationList = new RelationList(attrOrder);
+        HashSet<String> newAttrs = new HashSet<>(attrs);
+        newAttrs.remove(attr);
+        Relation newRelationList = new RelationList(newAttrs);
         for (Tuple newTuple : newTuples.keySet()) {
-            newRelationList.insert(newTuple.setAnnot(newTuples.get(newTuple)));
+            newRelationList.insert(
+                    (new Tuple(newTuple)).setAnnot(newTuples.get(newTuple)));
         }
         return newRelationList;
     }

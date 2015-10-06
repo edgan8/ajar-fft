@@ -23,8 +23,9 @@ public class AttrSetTest {
         values2.add("dog");
         AttrSet aSet2 = new AttrSet("Animals", values2);
 
-        aSet1.intersect(aSet2);
-        assertTrue(aSet1.containsValue("cat"));
-        assertFalse(aSet1.containsValue("mouse"));
+        SortedSet<String> iSet = new TreeSet<>(values1);
+        aSet2.filter(iSet);
+        assertTrue(iSet.contains("cat"));
+        assertFalse(iSet.contains("mouse"));
     }
 }

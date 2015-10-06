@@ -1,6 +1,7 @@
 package org.hazy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeSet;
 
 /**
@@ -33,7 +34,9 @@ public class RelationFFTFactor implements Relation {
 
     public ArrayList<Tuple> getTuples() {
         throw new UnsupportedOperationException("Fat FFT Factor");
-
+    }
+    public ArrayList<String> getAttributes() {
+        return new ArrayList<>(Arrays.asList(var1.toString(), var2.toString()));
     }
 
     public boolean hasAttribute(String attrStr) {
