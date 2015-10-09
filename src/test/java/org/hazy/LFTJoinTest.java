@@ -16,12 +16,11 @@ public class LFTJoinTest {
     @Test
     public void simpleIndexTest() {
         ArrayList<String> globalAttrOrdering = new ArrayList<>(Arrays.asList("Pet", "Name", "State"));
-        LFTJoin join = new LFTJoin(globalAttrOrdering);
         ArrayList<Relation> relationsToJoin = new ArrayList<>();
 
         // Relation 1
         ArrayList<String> attrNames1 = new ArrayList<>(Arrays.asList("Name", "State"));
-        Relation tree1 = new RelationList(attrNames1);
+        Relation tree1 = new RelationTrie(attrNames1);
         Map<String, String> attrs = new TreeMap<>();
         attrs.put("State", "md");
         attrs.put("Name", "ed");
@@ -36,7 +35,7 @@ public class LFTJoinTest {
 
         // Relation 2
         ArrayList<String> attrNames2 = new ArrayList<>(Arrays.asList("Pet", "Name"));
-        Relation tree2 = new RelationList(attrNames2);
+        Relation tree2 = new RelationTrie(attrNames2);
         attrs = new TreeMap<>();
         attrs.put("Pet", "fido");
         attrs.put("Name", "ed");
@@ -58,6 +57,7 @@ public class LFTJoinTest {
         relationsToJoin.add(tree1);
         relationsToJoin.add(tree2);
         try {
+            LFTJoin join = new LFTJoin(globalAttrOrdering);
             Relation output = join.run(relationsToJoin);
             ArrayList<Tuple> results = output.getTuples();
             assertEquals(3, results.size());

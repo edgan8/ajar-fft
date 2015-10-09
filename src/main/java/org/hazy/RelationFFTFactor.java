@@ -65,6 +65,16 @@ public class RelationFFTFactor implements Relation {
         return new ComplexAnnot(factorReal, factorIm);
     }
 
+    @Override
+    public Relation select(String attrName, String attrVal) {
+        return this;
+    }
+
+    @Override
+    public boolean supportsSelect() {
+        return false;
+    }
+
     public void insert(Tuple t) {
         throw new UnsupportedOperationException("Can't insert into FFT Factor");
     }

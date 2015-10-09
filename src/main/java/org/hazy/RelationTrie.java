@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class RelationTrie implements Relation {
     // specifies the attributes it contains in order
-    private final ArrayList<String> attrs;
+    private ArrayList<String> attrs;
 
     // Can't both have subtrees and an annotation
 
@@ -22,13 +22,24 @@ public class RelationTrie implements Relation {
         this.annot = null;
     }
 
-    private ArrayList<Tuple> getTuples(Tuple t) {
+    public ArrayList<Tuple> getTuples() {
+        return getTuplesRec(Tuple.empty());
+    }
+
+    private ArrayList<Tuple> getTuplesRec(Tuple t) {
         ArrayList<Tuple> output = new ArrayList<>();
         if (subTrees.isEmpty()) {
             output.add((new Tuple(t)).setAnnot(annot));
             return output;
         }
-        return null;
+        String rootAttrName = attrs.get(0);
+        for (String rootAttrValue : subTrees.keySet()) {
+            t.append(rootAttrName, rootAttrValue);
+            RelationTrie subTrie = subTrees.get(rootAttrValue);
+            output.addAll(subTrie.getTuplesRec(t));
+            t.remove(rootAttrName);
+        }
+        return output;
     }
 
     public boolean hasAttribute(String attr) {
@@ -44,6 +55,14 @@ public class RelationTrie implements Relation {
         // and attr is right after
         if (attr.equals(attrs.get(0))) {
             return (new AttrSet(attr, subTrees.keySet()));
+        }
+        String rootAttrName = attrs.get(0);
+        if (!t.containsAttr(rootAttrName)) {
+            System.out.println(t);
+            System.out.println(attr);
+            System.out.println(attrs);
+            System.out.println(this);
+            throw new IndexOutOfBoundsException("Out of order indexing");
         }
         String rootAttrValue = t.getAttrValue(attrs.get(0));
         if (subTrees.containsKey(rootAttrValue)) {
@@ -67,6 +86,23 @@ public class RelationTrie implements Relation {
         }
     }
 
+    @Override
+    public Relation select(String attrName, String attrVal) {
+        if (!attrName.equals(attrs.get(0))) {
+            throw new UnsupportedOperationException("trie selection invalid");
+        }
+        if (subTrees.containsKey(attrVal)) {
+            return subTrees.get(attrVal);
+        } else {
+            throw new UnsupportedOperationException("trie attrval not found");
+        }
+    }
+
+    @Override
+    public boolean supportsSelect() {
+        return true;
+    }
+
     public void insert(Tuple t) {
         if (t.getAttrs().isEmpty()) {
             this.annot = t.getAnnot();
@@ -84,8 +120,43 @@ public class RelationTrie implements Relation {
         t.append(rootAttr, rootValue);
     }
 
-    public Relation aggregate(String attr) {
-        return null;
+    // Can only aggregate the last attribute in the ordering
+    public RelationTrie aggregate(String attr) {
+        if (attrs.size() == 1) {
+            if (attr.equals(attrs.get(0))) {
+                if (attrs.size() != 1) {
+                    throw new UnsupportedOperationException("invalid aggregation on trie");
+                }
+                Annotation a = calcSum();
+                annot = a;
+                subTrees = new TreeMap<>();
+                return this;
+            } else {
+                return this;
+            }
+        } else {
+            for (RelationTrie subTrie : subTrees.values()) {
+                subTrie.aggregate(attr);
+                attrs.remove(attr);
+            }
+            return this;
+        }
+    }
+
+    private Annotation calcSum() {
+        Annotation a = null;
+        if (subTrees.isEmpty()) {
+            return annot;
+        }
+        for (RelationTrie subTrie : subTrees.values()) {
+            Annotation subAnnot = subTrie.calcSum();
+            if (a == null) {
+                a = subAnnot;
+            } else {
+                a = a.add(subAnnot);
+            }
+        }
+        return a;
     }
 
     public String toString() {

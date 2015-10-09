@@ -39,6 +39,16 @@ public class RelationList implements Relation {
         throw new IndexOutOfBoundsException("Tuple not found");
     }
 
+    @Override
+    public Relation select(String attrName, String attrVal) {
+        return this;
+    }
+
+    @Override
+    public boolean supportsSelect() {
+        return false;
+    }
+
     public AttrSet index(Tuple tKey, String attr) throws IndexOutOfBoundsException {
         if (!hasAttribute(attr)) {
             throw new IndexOutOfBoundsException("Attribute not part of relation");

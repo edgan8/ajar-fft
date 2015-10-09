@@ -12,10 +12,8 @@ public class LFTJoin {
         this.attrOrdering = new ArrayList<>(attrOrdering);
     }
 
-    public Relation run(
-            ArrayList<Relation> relations
-    ) throws Exception {
-        Relation output = new RelationList(attrOrdering);
+    public Relation run(ArrayList<Relation> relations) throws Exception {
+        Relation output = new RelationTrie(attrOrdering);
         join(relations, output, Tuple.empty(), 0);
         return output;
     }
@@ -42,8 +40,8 @@ public class LFTJoin {
         }
 
         String curAttribute = attrOrdering.get(attrIndex);
-
         ArrayList<AttrSet> aSets = new ArrayList<>();
+
         for (Relation rTrie : relations) {
             if (rTrie.hasAttribute(curAttribute)) {
                 aSets.add(rTrie.index(t, curAttribute));
@@ -52,13 +50,25 @@ public class LFTJoin {
         if (aSets.size() == 0) {
             throw new Exception("There should exist a relation for each attribute.");
         }
-        Set<String> intersectionSet = new TreeSet<String>(aSets.get(0).getValues());
+        Set<String> intersectionSet = new TreeSet<>(aSets.get(0).getValues());
         for (int i = 1; i < aSets.size(); i++) {
             aSets.get(i).filter(intersectionSet);
         }
+
         for (String attrValue : intersectionSet) {
+            // run some selections on the relations to optimize
+            ArrayList<Relation> newRelations = new ArrayList<>(relations.size());
+            for (Relation rel : relations) {
+                if (rel.supportsSelect() && rel.hasAttribute(curAttribute)) {
+                    // value must exist since we calculated intersection
+                    newRelations.add(rel.select(curAttribute, attrValue));
+                } else {
+                    newRelations.add(rel);
+                }
+            }
+
             t.append(curAttribute, attrValue);
-            join(relations,
+            join(newRelations,
                     output,
                     t,
                     attrIndex + 1

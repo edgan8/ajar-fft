@@ -79,6 +79,16 @@ public class RelationPVec implements Relation {
         return values[tIntValue];
     }
 
+    @Override
+    public Relation select(String attrName, String attrVal) {
+        return this;
+    }
+
+    @Override
+    public boolean supportsSelect() {
+        return false;
+    }
+
     public void insert(Tuple t) {
         throw new UnsupportedOperationException("Can't insert into Pvec");
     }

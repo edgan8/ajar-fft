@@ -10,8 +10,8 @@ public class FFTAJBench {
     @Test
     public void canFFTLarge() throws Exception {
         int p = 10;
-        int m = 4;
-        int n = 10000;
+        int m = 5;
+        int n = 100000;
         double[] waveSamples = new double[n];
         for (int i = 0; i < n; i++) {
             Random r = new Random();

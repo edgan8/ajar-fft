@@ -81,7 +81,10 @@ public class FFTAJ {
             System.out.println(stepJoin);
             System.out.println(stepAttrNames);
             */
-            ArrayList<String> stepAttrOrdering = new ArrayList<>(stepAttrNames);
+
+            ArrayList<String> stepAttrOrdering = getAttrOrdering();
+            stepAttrOrdering.retainAll(stepAttrNames);
+
             LFTJoin join = new LFTJoin(stepAttrOrdering);
             Relation stepOutput = join.run(stepJoin).aggregate(aggAttr.toString());
             for (Relation r : stepJoin) {
