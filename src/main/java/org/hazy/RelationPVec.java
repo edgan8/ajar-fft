@@ -15,6 +15,8 @@ public class RelationPVec implements Relation {
     public int numDigits;
     public int n;
     public TreeSet<String> completeValues;
+    public ArrayList<String> attrNames;
+    public Map<String, Integer> attrNumPower;
 
     public RelationPVec(String name, Annotation[] values, int base, int numDigits) {
         this.name = name;
@@ -26,14 +28,19 @@ public class RelationPVec implements Relation {
         for (int i = 0; i < base; i++) {
             this.completeValues.add(Integer.toString(i));
         }
+
+        attrNames = new ArrayList<>();
+        attrNumPower = new HashMap<>();
+        for (int i = 0; i < numDigits; i++) {
+            String attrName = new IndexedAttr(name, i).toString();
+            attrNames.add(attrName);
+            attrNumPower.put(attrName, MathUtils.intPow(base, i));
+        }
+
     }
 
     public ArrayList<String> getAttributes() {
-        ArrayList<String> attrs = new ArrayList<>();
-        for (int i = 0; i < numDigits; i++) {
-            attrs.add((new IndexedAttr(name, i)).toString());
-        }
-        return attrs;
+        return attrNames;
     }
 
     public ArrayList<Tuple> getTuples() {
@@ -45,7 +52,7 @@ public class RelationPVec implements Relation {
             MathUtils.convertBaseN(i, base, digits);
             for (int j = 0; j < numDigits; j++){
                 attrValues.put(
-                        (new IndexedAttr(name, j)).toString(),
+                        attrNames.get(j),
                         Integer.toString(digits[j])
                 );
             }
@@ -70,18 +77,23 @@ public class RelationPVec implements Relation {
         int tIntValue = 0;
         Map<String, String> attrs = t.getAttrs();
         for (String attrName : attrs.keySet()) {
-            IndexedAttr iAttr = new IndexedAttr(attrName);
-            if (iAttr.attrBase.equals(name)) {
+            if (attrNumPower.containsKey(attrName)) {
                 int attrValue = Integer.parseInt(attrs.get(attrName));
-                tIntValue += attrValue * Math.pow(base, iAttr.idx);
+                tIntValue += attrValue * attrNumPower.get(attrName);
             }
         }
         return values[tIntValue];
     }
 
     @Override
-    public Relation select(String attrName, String attrVal) {
-        return this;
+    public Relation select(Tuple t) {
+        for (String attrName : attrNames) {
+            if (!t.containsAttr(attrName)) {
+                return this;
+            }
+        }
+        // if we are selecting all our attributes, return an empty relation
+        return new RelationEmpty(getAnnotation(t));
     }
 
     @Override

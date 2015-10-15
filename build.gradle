@@ -13,3 +13,10 @@ dependencies {
     compile 'org.apache.commons:commons-math3:3.5+'
     testCompile 'junit:junit:4.+'
 }
+
+test {
+    testLogging {
+        events 'passed'
+    }
+}
+

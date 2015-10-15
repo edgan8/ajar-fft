@@ -87,15 +87,19 @@ public class RelationTrie implements Relation {
     }
 
     @Override
-    public Relation select(String attrName, String attrVal) {
-        if (!attrName.equals(attrs.get(0))) {
-            throw new UnsupportedOperationException("trie selection invalid");
+    public Relation select(Tuple t) {
+        Map<String, String> tAttrs = t.getAttrs();
+        for (String attrName : tAttrs.keySet()) {
+            if (attrName.equals(attrs.get(0))) {
+                String attrVal = tAttrs.get(attrName);
+                if (subTrees.containsKey(attrVal)) {
+                    return subTrees.get(attrVal);
+                } else {
+                    throw new UnsupportedOperationException("trie attrval not found");
+                }
+            }
         }
-        if (subTrees.containsKey(attrVal)) {
-            return subTrees.get(attrVal);
-        } else {
-            throw new UnsupportedOperationException("trie attrval not found");
-        }
+        return this;
     }
 
     @Override
@@ -104,20 +108,19 @@ public class RelationTrie implements Relation {
     }
 
     public void insert(Tuple t) {
-        if (t.getAttrs().isEmpty()) {
+        if (attrs.isEmpty()) {
             this.annot = t.getAnnot();
             return;
         }
         String rootAttr = attrs.get(0);
-        String rootValue = t.getAttrValue(attrs.get(0));
+        String rootValue = t.getAttrValue(rootAttr);
         if (subTrees.containsKey(rootValue)) {
-            subTrees.get(rootValue).insert(t.remove(rootAttr));
+            subTrees.get(rootValue).insert(t);
         } else {
             RelationTrie newTrie = new RelationTrie(attrs.subList(1, attrs.size()));
             subTrees.put(rootValue, newTrie);
-            newTrie.insert(t.remove(rootAttr));
+            newTrie.insert(t);
         }
-        t.append(rootAttr, rootValue);
     }
 
     // Can only aggregate the last attribute in the ordering
@@ -130,6 +133,7 @@ public class RelationTrie implements Relation {
                 Annotation a = calcSum();
                 annot = a;
                 subTrees = new TreeMap<>();
+                attrs = new ArrayList<>();
                 return this;
             } else {
                 return this;

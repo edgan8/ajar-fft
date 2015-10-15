@@ -40,7 +40,7 @@ public class RelationList implements Relation {
     }
 
     @Override
-    public Relation select(String attrName, String attrVal) {
+    public Relation select(Tuple t) {
         return this;
     }
 

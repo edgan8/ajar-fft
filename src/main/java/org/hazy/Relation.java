@@ -24,8 +24,9 @@ interface Relation {
     /**
      * Returns a relation with only those tuples that match
      * @return new or unmodified relation that matches on attr, not includin attr
+     * @param t
      */
-    Relation select(String attrName, String attrVal);
+    Relation select(Tuple t);
     // Whether or not this relation benefits from doing selection
     boolean supportsSelect();
 

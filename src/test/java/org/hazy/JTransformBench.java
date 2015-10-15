@@ -1,18 +1,17 @@
 package org.hazy;
 
+import org.jtransforms.fft.DoubleFFT_1D;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class FFTAJBench {
+public class JTransformBench {
     @Test
     public void canFFTLarge() throws Exception {
-        int p = 10;
-        int m = 5;
         int n = 100000;
-        double[] waveSamples = new double[n];
+        double[] waveSamples = new double[2*n];
         for (int i = 0; i < n; i++) {
             Random r = new Random();
             waveSamples[i] = r.nextDouble();
@@ -21,10 +20,11 @@ public class FFTAJBench {
             ) / n;
         }
 
-        FFTAJ fft = new FFTAJ(p, m);
+        DoubleFFT_1D fft = new DoubleFFT_1D(n);
         long startTime = System.currentTimeMillis();
 
-        double[] freqSamples = fft.realForward(waveSamples);
+        fft.realForwardFull(waveSamples);
+        double[] freqSamples = waveSamples;
 
         long endTime = System.currentTimeMillis();
         System.out.println("Took: "+Long.toString(endTime - startTime));

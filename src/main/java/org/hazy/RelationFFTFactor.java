@@ -13,6 +13,7 @@ public class RelationFFTFactor implements Relation {
     public int m;
     public IndexedAttr var1, var2;
     public AttrSet var1AttrSet, var2AttrSet;
+    String v1, v2;
 
     public RelationFFTFactor(
             int base,
@@ -24,6 +25,8 @@ public class RelationFFTFactor implements Relation {
         this.m = m;
         this.var1 = var1;
         this.var2 = var2;
+        this.v1 = var1.toString();
+        this.v2 = var2.toString();
         TreeSet<String> attrValues = new TreeSet<>();
         for (int i = 0; i < base; i++) {
             attrValues.add(Integer.toString(i));
@@ -43,22 +46,21 @@ public class RelationFFTFactor implements Relation {
         if (!IndexedAttr.isIndexed(attrStr)) {
             return false;
         }
-        IndexedAttr attr = new IndexedAttr(attrStr);
-        return var1.equals(attr) || var2.equals(attr);
+        return v1.equals(attrStr) || v2.equals(attrStr);
     }
 
     public AttrSet index(Tuple t, String attr) {
-        if(attr.equals(var1.toString())) {
+        if(attr.equals(v1)) {
             return var1AttrSet;
-        } else if (attr.equals(var2.toString())) {
+        } else if (attr.equals(v2)) {
             return var2AttrSet;
         }
         return null;
     }
 
     public Annotation getAnnotation(Tuple t) {
-        int var1Value = Integer.parseInt(t.getAttrValue(var1.toString()));
-        int var2Value = Integer.parseInt(t.getAttrValue(var2.toString()));
+        int var1Value = Integer.parseInt(t.getAttrValue(v1));
+        int var2Value = Integer.parseInt(t.getAttrValue(v2));
         double exponent = (2 * Math.PI * var1Value * var2Value) / (Math.pow(base, m - var1.idx - var2.idx));
         double factorReal = Math.cos(exponent);
         double factorIm = Math.sin(exponent);
@@ -66,8 +68,12 @@ public class RelationFFTFactor implements Relation {
     }
 
     @Override
-    public Relation select(String attrName, String attrVal) {
-        return this;
+    public Relation select(Tuple t) {
+        if (t.containsAttr(v1) && t.containsAttr(v2)) {
+            return (new RelationEmpty(getAnnotation(t)));
+        } else {
+            return this;
+        }
     }
 
     @Override
