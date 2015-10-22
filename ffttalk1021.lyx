@@ -1,0 +1,653 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+AJAR FFT Notes
+\end_layout
+
+\begin_layout Date
+10/21/2015
+\end_layout
+
+\begin_layout Section
+Problem
+\end_layout
+
+\begin_layout Subsection
+DFT
+\end_layout
+
+\begin_layout Standard
+In: 
+\begin_inset Formula $\vec{b}$
+\end_inset
+
+, Out: 
+\begin_inset Formula $\vec{F}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F\left(x\right)=\sum_{y=0}^{n-1}b_{y}e^{2\pi ixy/n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Matrix Multiplication 
+\begin_inset Formula $\vec{F}=A\vec{b}$
+\end_inset
+
+, 
+\begin_inset Formula $A_{xy}=e^{2\pi ixy/n}$
+\end_inset
+
+, computing 
+\begin_inset Formula $\vec{F}$
+\end_inset
+
+ is 
+\begin_inset Formula $n^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+FFT
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+F_{x} & = & \sum_{y=0}^{n-1}b_{y}e^{2\pi ixy/n}\\
+ & = & \sum_{y=0}^{n/2-1}e^{2\pi ixy/\left(n/2\right)}b_{2y}+A_{1x}\sum_{y=0}^{n/2-1}e^{2\pi ixy/\left(n/2\right)}b_{2y+1}\\
+ & = & F_{x}^{e}+A_{1x}F_{x}^{o}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $F^{e}$
+\end_inset
+
+, 
+\begin_inset Formula $F^{o}$
+\end_inset
+
+ have half the period, bottoms out at identity.
+ 
+\begin_inset Formula $n\ln n$
+\end_inset
+
+ multiplications and additions and exponentiations
+\end_layout
+
+\begin_layout Standard
+1 point transforms have period 1, 2 point transforms have period 2, ...
+\end_layout
+
+\begin_layout Section
+AJAR Encodingx
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $x,y$
+\end_inset
+
+ indices into 
+\begin_inset Formula $F$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+x & = & \sum_{i}^{m-1}x_{i}p^{i}\\
+y & = & \sum_{i}^{m-1}y_{i}p^{i}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\vec{x},\vec{y}$
+\end_inset
+
+ vector indices interpreted base 
+\begin_inset Formula $p$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{\vec{x}}=\sum_{\vec{y}}b_{\vec{y}}\prod_{j+k\leq m}e^{2\pi ix_{j}y_{k}/p^{m-j-k}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+AJAR Attributes: 
+\begin_inset Formula $Y_{0}...Y_{m-1}$
+\end_inset
+
+ , 
+\begin_inset Formula $X_{0}...X_{m-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $B\left(\vec{Y}\right)=b_{\vec{y}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $RX^{jk}\left(X_{j},Y_{k}\right)=e^{2\pi ixy/p^{m-j-k}}$
+\end_inset
+
+, 
+\begin_inset Formula $j+k\leq m$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Join and then aggregate out all the 
+\begin_inset Formula $Y$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Query Plan
+\end_layout
+
+\begin_layout Standard
+Draw out hypergraph
+\end_layout
+
+\begin_layout Standard
+Hypertree:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{gather*}
+X_{2}X_{1}X_{0}\\
+X_{1}X_{0},Y_{0}\\
+X_{0},Y_{1}Y_{0}\\
+Y_{2}Y_{1}Y_{0}
+\end{gather*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $pn\log n$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Java Backend
+\end_layout
+
+\begin_layout Itemize
+Sets: TreeSet
+\end_layout
+
+\begin_layout Itemize
+Tries: TreeMap
+\end_layout
+
+\begin_layout Itemize
+Relations: HashSet of Attributes + Trie
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+hasAttribute
+\end_layout
+
+\begin_layout Itemize
+getAnnotation
+\end_layout
+
+\begin_layout Itemize
+index
+\end_layout
+
+\begin_layout Itemize
+select
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="6">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ms
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{5}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AJFFT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+168
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1188
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9139
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+123000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+JT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+93
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+465
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $n\ln n$
+\end_inset
+
+ growth?
+\end_layout
+
+\begin_layout Standard
+Profiling
+\end_layout
+
+\begin_layout Itemize
+Trie Aggregation: 5
+\end_layout
+
+\begin_layout Itemize
+Trie Insertion: 37
+\end_layout
+
+\begin_layout Itemize
+Get Annotations: 36
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Looping, checking: 30
+\end_layout
+
+\begin_layout Itemize
+Trie: 4
+\end_layout
+
+\begin_layout Itemize
+InputVec: 2
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Intersection: 7
+\end_layout
+
+\begin_layout Itemize
+Tuple Manip: 10
+\end_layout
+
+\begin_layout Section
+Java Simulation
+\end_layout
+
+\begin_layout Standard
+Reduction to 
+\begin_inset Formula $p=2$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+For 
+\begin_inset Formula $x_{0}..x_{i}y_{0}..y_{m-i-1}$
+\end_inset
+
+ from 
+\begin_inset Formula $1:n$
+\end_inset
+
+ in binary
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $x_{0}..x_{i}y_{0}..y_{m-i-1}$
+\end_inset
+
+, 
+\begin_inset Formula $x_{i+1}=0$
+\end_inset
+
+, Annot is the same
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x_{0}..x_{i}y_{0}..y_{m-i-1}$
+\end_inset
+
+, 
+\begin_inset Formula $x_{i+1}=1$
+\end_inset
+
+, Annot is 
+\begin_inset Formula $e^{2\pi i\left(\sum\frac{1}{2^{m-\left(i+1\right)-j}}\right)}$
+\end_inset
+
+ for 
+\begin_inset Formula $y_{j}=1$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Analysis:
+\end_layout
+
+\begin_layout Itemize
+n times
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+x=0: 1+
+\end_layout
+
+\begin_layout Itemize
+x=1: 2(# of ones?)x, 1+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Timing: 10^6: 1700
+\end_layout
+
+\begin_layout Standard
+Same access patterns as FFT, slightly different multiplication order
+\end_layout
+
+\end_body
+\end_document
