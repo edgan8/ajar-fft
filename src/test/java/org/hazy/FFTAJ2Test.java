@@ -7,11 +7,10 @@ import static org.junit.Assert.assertEquals;
 public class FFTAJ2Test {
     @Test
     public void canFFTZeroes() throws Exception {
-        int p = 2;
         int m = 3;
         int n = 8;
         double[] zeroes = new double[n];
-        FFTAJ fft = new FFTAJ(p, m);
+        FFTAJ2 fft = new FFTAJ2(n);
         double[] freqSamples = fft.realForward(zeroes);
         assertEquals(0.0, freqSamples[0], .001);
     }
@@ -28,7 +27,7 @@ public class FFTAJ2Test {
             ) / n;
         }
 
-        FFTAJ fft = new FFTAJ(p, m);
+        FFTAJ2 fft = new FFTAJ2(n);
         double[] freqSamples = fft.realForward(waveSamples);
 
         // no constant component

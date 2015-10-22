@@ -1,6 +1,7 @@
 package org.hazy;
 
 import org.jtransforms.fft.DoubleFFT_1D;
+import pl.edu.icm.jlargearrays.ConcurrencyUtils;
 import org.junit.Test;
 
 import java.util.Random;
@@ -10,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class JTransformBench {
     @Test
     public void canFFTLarge() throws Exception {
-        int n = 100000;
+        int n = 4000000;
         double[] waveSamples = new double[2*n];
         for (int i = 0; i < n; i++) {
             Random r = new Random();
@@ -19,6 +20,7 @@ public class JTransformBench {
                     (double) 2*Math.PI*i / n
             ) / n;
         }
+        ConcurrencyUtils.setNumberOfThreads(1);
 
         DoubleFFT_1D fft = new DoubleFFT_1D(n);
         long startTime = System.currentTimeMillis();

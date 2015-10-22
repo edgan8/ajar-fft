@@ -65,22 +65,26 @@ public class FFTAJ {
         Relation bRel = getInputRelation(b);
         toJoin.add(bRel);
 
-        // join all relation involving y_i and project it out for each y_i
-        for (int i = m - 1; i >= 0; i--) {
-            IndexedAttr aggAttr = new IndexedAttr(yVar, i);
-            ArrayList<Relation> stepJoin = new ArrayList<>();
-            Set<String> stepAttrNames = new HashSet<String>();
+        ArrayList<Relation> stepJoin = new ArrayList<>();
+        Set<String> stepAttrNames = new HashSet<String>();
+        stepJoin.add(bRel);
+        stepAttrNames.addAll(bRel.getAttributes());
+
+        // Join input (previous output) with all relations involving xi and then project out y_(m-i)
+        for (int i = 0; i < m; i++) {
+            String xVarName = (new IndexedAttr(xVar, i)).toString();
+            IndexedAttr aggAttr = new IndexedAttr(yVar, m-i-1);
             for (Relation r : toJoin) {
-                if (r.hasAttribute(aggAttr.toString())) {
+                if (r.hasAttribute(xVarName)) {
                     stepJoin.add(r);
                     stepAttrNames.addAll(r.getAttributes());
                 }
             }
-            /*
+
             System.out.println(aggAttr.toString());
-            System.out.println(stepJoin);
+            // System.out.println(stepJoin);
             System.out.println(stepAttrNames);
-            */
+
 
             ArrayList<String> stepAttrOrdering = getAttrOrdering();
             stepAttrOrdering.retainAll(stepAttrNames);
@@ -93,7 +97,11 @@ public class FFTAJ {
                     throw (new Exception("could not find relation"));
                 }
             }
+            stepJoin = new ArrayList<>();
+            stepAttrNames = new HashSet<>();
             toJoin.add(stepOutput);
+            stepJoin.add(stepOutput);
+            stepAttrNames.addAll(stepOutput.getAttributes());
         }
         if (toJoin.size() != 1) throw new AssertionError("more than 1 rel left");
         Relation outputRel = toJoin.get(0);

@@ -59,6 +59,7 @@ public class LFTJoinTest {
         try {
             LFTJoin join = new LFTJoin(globalAttrOrdering);
             Relation output = join.run(relationsToJoin);
+            System.out.println(join.relationsDone);
             ArrayList<Tuple> results = output.getTuples();
             assertEquals(3, results.size());
             System.out.println(output.getTuples());

@@ -9,17 +9,15 @@ public class FFTAJ3Bench {
     }
 
     public static void canFFTLarge() throws Exception {
-        int n = 1000000;
+        int n = 4000000;
         double[] waveSamples = new double[n];
         for (int i = 0; i < n; i++) {
-            Random r = new Random();
-            waveSamples[i] = r.nextDouble();
             waveSamples[i] = Math.cos(
                     (double) 2*Math.PI*i / n
             ) / n;
         }
 
-        FFTAJ2 fft = new FFTAJ2(n);
+        FFTAJ3 fft = new FFTAJ3(n);
         long startTime = System.currentTimeMillis();
 
         double[] freqSamples = fft.realForward(waveSamples);

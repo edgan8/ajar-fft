@@ -9,9 +9,7 @@ public class FFTAJ2Bench {
     }
 
     public static void canFFTLarge() throws Exception {
-        int p = 10;
-        int m = 6;
-        int n = 1000000;
+        int n = 4000000;
         double[] waveSamples = new double[n];
         for (int i = 0; i < n; i++) {
             Random r = new Random();
@@ -21,13 +19,13 @@ public class FFTAJ2Bench {
             ) / n;
         }
 
-        FFTAJ fft = new FFTAJ(p, m);
+        FFTAJ2 fft = new FFTAJ2(n);
         long startTime = System.currentTimeMillis();
 
         double[] freqSamples = fft.realForward(waveSamples);
 
         long endTime = System.currentTimeMillis();
-        System.out.println("First 10 feqs:");
+        System.out.println("First 10 freqs:");
         for (int i = 0; i < 10; i++) {
             System.out.println(freqSamples[2*i]+":"+freqSamples[2*i+1]);
         }

@@ -7,15 +7,32 @@ import java.util.*;
  */
 public class LFTJoin {
     private final ArrayList<String> attrOrdering;
+    // which relations are done by each point in the attr ordering
+    public boolean[][] relationsDone;
 
     public LFTJoin(ArrayList<String> attrOrdering) {
         this.attrOrdering = new ArrayList<>(attrOrdering);
     }
 
     public Relation run(ArrayList<Relation> relations) throws Exception {
+        System.out.println(attrOrdering);
         Relation output = new RelationTrie(attrOrdering);
+        calcDonePoints(relations);
         join(relations, output, Tuple.empty(), 0, null);
         return output;
+    }
+
+    private void calcDonePoints(ArrayList<Relation> relations) {
+        relationsDone = new boolean[attrOrdering.size()][relations.size()];
+        for (int attrIndex = 0; attrIndex < attrOrdering.size(); attrIndex++) {
+            List<String> curAttrs = attrOrdering.subList(0, attrIndex + 1);
+            for (int i = 0; i < relations.size(); i++) {
+                Relation r = relations.get(i);
+                if (curAttrs.containsAll(r.getAttributes())) {
+                    relationsDone[attrIndex][i] = true;
+                }
+            }
+        }
     }
 
     private void join(
@@ -26,42 +43,26 @@ public class LFTJoin {
             Annotation partialResult
     ) throws Exception {
         if (attrIndex == attrOrdering.size()) {
-            if (relations.size() != 0) {
-                System.out.println("wut");
-                Annotation a = getAnnotation(relations, t);
-                // TODO: look at this
-                if (partialResult != null) {
-                    output.insert(t.setAnnot(partialResult.mult(a)));
-                }
-            } else {
-                output.insert(t.setAnnot(partialResult));
-            }
+            output.insert(t.setAnnot(partialResult));
             return;
         }
 
         String curAttribute = attrOrdering.get(attrIndex);
         Set<String> intersectionSet = getIntersectionSet(relations, t, curAttribute);
+        ArrayList<Relation> newRelations = new ArrayList<>(relations);
 
         for (String attrValue : intersectionSet) {
             t.append(curAttribute, attrValue);
-            // run some selections on the relations to optimize
-            ArrayList<Relation> subRelations = getSubRelations(relations, t);
-            ArrayList<Relation> filteredRelations = new ArrayList<>();
-            Annotation newPartialResult = partialResult;
-            for (Relation r : subRelations) {
-                if(r.getAttributes().size()==0) {
-                    Annotation a = r.getAnnotation(t);
-                    if (newPartialResult == null) {
-                        newPartialResult = a;
-                    } else {
-                        newPartialResult = newPartialResult.mult(a);
-                    }
-                } else {
-                    filteredRelations.add(r);
-                }
-            }
 
-            join(filteredRelations,
+            Annotation newPartialResult = getAnnotations(
+                    relations,
+                    newRelations,
+                    t,
+                    attrIndex,
+                    partialResult
+            );
+
+            join(newRelations,
                     output,
                     t,
                     attrIndex + 1,
@@ -71,55 +72,57 @@ public class LFTJoin {
         }
     }
 
+    private Annotation getAnnotations(
+            ArrayList<Relation> relations,
+            ArrayList<Relation> newRelations,
+            Tuple t,
+            int attrIndex,
+            Annotation partialResult) {
+        int numRelations = relations.size();
+        for (int rIndex = 0; rIndex < numRelations; rIndex++) {
+            // if the relation should be done by now, the upper level should have already processed it
+            if (attrIndex > 0 && relationsDone[attrIndex-1][rIndex]) {
+                continue;
+            } else {
+                Relation r = relations.get(rIndex);
+                if (relationsDone[attrIndex][rIndex]) {
+                    Annotation a = r.getAnnotation(t);
+                    if (partialResult == null) {
+                        partialResult = a;
+                    } else {
+                        partialResult = partialResult.mult(a);
+                    }
+                    continue;
+                }
+                else if (r.supportsSelect()) {
+                    newRelations.set(rIndex, r.select(t));
+                }
+            }
+        }
+        return partialResult;
+    }
+
     private Set<String> getIntersectionSet(
             ArrayList<Relation> relations,
             Tuple t,
             String curAttribute) {
-        ArrayList<AttrSet> aSets = new ArrayList<>();
+        Set<String> intersectionSet = null;
 
         for (Relation rTrie : relations) {
             if (rTrie.hasAttribute(curAttribute)) {
-                aSets.add(rTrie.index(t, curAttribute));
+                AttrSet curAttrSet = rTrie.index(t, curAttribute);
+                if (intersectionSet == null) {
+                    intersectionSet = new TreeSet<>(curAttrSet.getValues());
+                } else {
+                    curAttrSet.filter(intersectionSet);
+                }
             }
         }
-        if (aSets.size() == 0) {
+        if (intersectionSet == null) {
             throw new UnsupportedOperationException(
                     "There should exist a relation for each attribute."
             );
         }
-        Set<String> intersectionSet = new TreeSet<>(aSets.get(0).getValues());
-        for (int i = 1; i < aSets.size(); i++) {
-            aSets.get(i).filter(intersectionSet);
-        }
         return intersectionSet;
-    }
-
-    private Annotation getAnnotation(
-            ArrayList<Relation> relations,
-            Tuple tupleAttrs) {
-        Annotation a = null;
-        int numRelations = relations.size();
-
-        for (int i = 0; i < numRelations; ++i) {
-            Relation rTrie = relations.get(i);
-            Annotation rAnnot = rTrie.getAnnotation(tupleAttrs);
-            if (a == null) {
-                a = rAnnot;
-            } else {
-                a = a.mult(rAnnot);
-            }
-        }
-        return a;
-    }
-
-    private ArrayList<Relation> getSubRelations(
-            ArrayList<Relation> relations,
-            Tuple t) {
-        ArrayList<Relation> newRelations = new ArrayList<>(relations.size());
-        for (Relation rel : relations) {
-            // value must exist since we calculated intersection
-            newRelations.add(rel.select(t));
-        }
-        return newRelations;
     }
 }
