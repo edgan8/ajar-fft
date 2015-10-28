@@ -1,0 +1,635 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+DFT
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x)=\sum_{y=1}^{n}e^{2\pi ixy/n}b_{y}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Cooley-Tukey FFT
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+f_{n}(x) & = & \sum_{y=1}^{n}e^{2\pi ixy/n}b_{y}\\
+ & = & \sum_{y=1}^{n/2}e^{2\pi ixy/\left(n/2\right)}b_{2y}+e^{2\pi ix/n}\sum_{y=1}^{n/2}e^{2\pi ixy/\left(n/2\right)}b_{2y+1}\\
+ & = & f_{n/2}^{e}(x)+w_{n}^{x}\cdot f_{n/2}^{o}(x)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $w_{n}^{x}=e^{2\pi ix/n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So the iterative algorithm here is to evaluate all the 
+\begin_inset Formula $f_{n}(x)$
+\end_inset
+
+ for increasing 
+\begin_inset Formula $n$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+Base Case: 
+\begin_inset Formula $f_{1}^{y}(x)=b_{y'}$
+\end_inset
+
+ where 
+\begin_inset Formula $y'$
+\end_inset
+
+ is reverse binary of 
+\begin_inset Formula $eoeoeee...$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{2^{i+1}}^{y}(x)=f_{2^{i}}^{ye}(x)+w_{2^{i+1}}^{x}f_{2^{i}}^{yo}(x)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+AJAR-FFT
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $p=2$
+\end_inset
+
+ so 
+\begin_inset Formula $n=2^{m}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Attributes: 
+\begin_inset Formula $Y_{0}...Y_{m-1},X_{0}...X_{m-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Relations: 
+\begin_inset Formula $R_{ij}(X_{i},Y_{j})$
+\end_inset
+
+ for 
+\begin_inset Formula $i+j<m$
+\end_inset
+
+ and 
+\begin_inset Formula $B\left(Y_{0}...Y_{m-1}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Annotations: 
+\begin_inset Formula $R_{ij}\left(x,y\right)=e^{2\pi i\cdot2^{i+j}/n}$
+\end_inset
+
+ if 
+\begin_inset Formula $x=y=1$
+\end_inset
+
+ else 
+\begin_inset Formula $0$
+\end_inset
+
+, 
+\begin_inset Formula $B\left(\vec{y}\right)=b_{y}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Bags:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{array}{cc}
+Attrs & Relations\\
+Y_{0}X_{m-1}\cdots X_{1}X_{0} & B,R_{00},R_{10},\cdots,R_{(m-1)0}\\
+\vdots & \vdots\\
+Y_{0}\cdots Y_{m-2}X_{1}X_{0} & B,R_{0(m-2)},R_{1(m-2)}\\
+Y_{0}\cdots Y_{m-2}Y_{m-1}X_{0} & B,R_{0(m-1)}
+\end{array}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that in bag 
+\begin_inset Formula $i$
+\end_inset
+
+ starting from 
+\begin_inset Formula $i=1$
+\end_inset
+
+ we are aggregating out 
+\begin_inset Formula $Y_{m-i}$
+\end_inset
+
+ and joining all the relations involving that 
+\begin_inset Formula $Y$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $g_{2^{i}}^{y}(x)$
+\end_inset
+
+ be the annotation during bag 
+\begin_inset Formula $i$
+\end_inset
+
+ of the tuple 
+\begin_inset Formula $(\vec{y},\vec{x})$
+\end_inset
+
+.
+ By performing the join in the bag and joining with the bag below we have:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+g_{2^{i}}^{y}(x) & = & g_{2^{i-1}}^{y,y_{m-i}=0}(x)+g_{2^{i-1}}^{y,y_{m-i}=1}(x)\cdot\prod_{k}e^{2\pi i\left(2^{m-i+k}\right)/n}\qquad\sum2^{k}=x\\
+ & = & g_{2^{i-1}}^{y,y_{m-i}=0}(x)+g_{2^{i-1}}^{y,y_{m-i}=1}(x)\cdot e^{2\pi ix\cdot/2^{i}}\\
+ & = & g_{2^{i-1}}^{y,y_{m-i}=0}(x)+w_{2^{i}}^{x}\cdot g_{2^{i-1}}^{y,y_{m-i}=1}(x)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is the exact same computation we do in the cooley-tukey FFT above
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Subsection
+Designs
+\end_layout
+
+\begin_layout Itemize
+JTransforms
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Pure JAVA
+\end_layout
+
+\begin_layout Itemize
+No blocking
+\end_layout
+
+\begin_layout Itemize
+Tricky math optimizations
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Java-DB
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Trie structure
+\end_layout
+
+\begin_layout Itemize
+Chooses relations to join in at runtime
+\end_layout
+
+\begin_layout Itemize
+Java data structures
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+TreeSet, TreeMap for everything
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Java Simulation
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Loops through attribute values
+\end_layout
+
+\begin_layout Itemize
+Precomputes annotations
+\end_layout
+
+\begin_layout Itemize
+Dense relations, standard matrix layout
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Assumes complete relations
+\end_layout
+
+\begin_layout Itemize
+No set intersection
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Binary storage of tuples
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Benchmarks
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="6">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $n$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2^{16}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2^{18}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2^{20}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2^{22}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2^{24}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+JTr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+56
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+95
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+308
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+579
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1141
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+JSi
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+185
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+521
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1495
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5523
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+JDb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+JDb, base 4
+\end_layout
+
+\end_body
+\end_document
